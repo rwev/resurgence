@@ -6,9 +6,9 @@ setup(name='setup',
       author='rwev',
       author_email='rwev@protonmail.ch',
       url='https://github.com/rwev/resurgence',
-      packages=['resurgence'],
+      packages=['resurge'],
       entry_points={
-            'console_scripts': ('resurgence = resurgence.resurgence')
+            'console_scripts': ('resurgence = resurge.resurgence')
       },      install_requires=['psutil'],
       license='GNU GPL 3.0'
       )
