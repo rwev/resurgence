@@ -167,7 +167,7 @@ for filepath in filepaths_to_watch:
 # The current maximum file modified time under the watched directory
 last_edited_filepath, last_modification_time = get_last_edited_filepath_and_time(filepaths_to_watch)
 # shell=False => do not spawn shell process first. Results in fewer processes to kill.
-process = subprocess.Popen(command, shell=False)
+process = subprocess.Popen(command, shell=True)
 
 while True:
     temp_last_edited_filepath, temp_last_modification_time = get_last_edited_filepath_and_time(filepaths_to_watch)
@@ -180,6 +180,6 @@ while True:
         except Exception as e:
             print('\tUnable to kill process with ID %d. (Exception: %s' % (process.pid, e))
             pass
-        process = subprocess.Popen(command, shell=False)
+        process = subprocess.Popen(command, shell=True)
         print ('New process started with ID %d.' % process.pid)
     time.sleep(wait)
