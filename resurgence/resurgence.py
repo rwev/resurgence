@@ -4,18 +4,6 @@ RESURGENCE.PY
 Python script for restarting a process on file changes.
 
 Author: rwev (https://github.com/rwev)
-
-Recent changes:
-    * added kill_proc_tree using psutil dependency to kill further processes spawned by command (e.g. PyQt), including the parent shell terminal
-    * added proper option parser and extended customizability
-    * ability to focus on specified subdirectories (or working directory).
-    * only find matching files once to save computation (added files are not accounted for; script must be restarted)
-    * log observed file changed to console w/ timestamp
-Future changes:
-    * add function commentary
-    * add separate watches for new (added) files matching criteria
-    * error handling (e.g. for invalid directories or regex patterns)
-    * ability to specify regex to match directories
 """
 
 from __future__ import print_function
@@ -164,22 +152,27 @@ for filepath in filepaths_to_watch:
 
 ##### SPAWN PROCESS AND OBSERVATION LOOP ##### 
 
-# The current maximum file modified time under the watched directory
-last_edited_filepath, last_modification_time = get_last_edited_filepath_and_time(filepaths_to_watch)
-# shell=False => do not spawn shell process first. Results in fewer processes to kill.
-process = subprocess.Popen(command, shell=True)
+def main():
 
-while True:
-    temp_last_edited_filepath, temp_last_modification_time = get_last_edited_filepath_and_time(filepaths_to_watch)
-    print_stdout(process)
-    if temp_last_modification_time > last_modification_time:
-        last_modification_time = temp_last_modification_time
-        print('%s modified. Restarting...' % temp_last_edited_filepath)
-        try: 
-            kill_proc_tree(process.pid)
-        except Exception as e:
-            print('\tUnable to kill process with ID %d. (Exception: %s' % (process.pid, e))
-            pass
-        process = subprocess.Popen(command, shell=True)
-        print ('New process started with ID %d.' % process.pid)
-    time.sleep(wait)
+    # The current maximum file modified time under the watched directory
+    last_edited_filepath, last_modification_time = get_last_edited_filepath_and_time(filepaths_to_watch)
+    # shell=False => do not spawn shell process first. Results in fewer processes to kill.
+    process = subprocess.Popen(command, shell=True)
+
+    while True:
+        temp_last_edited_filepath, temp_last_modification_time = get_last_edited_filepath_and_time(filepaths_to_watch)
+        print_stdout(process)
+        if temp_last_modification_time > last_modification_time:
+            last_modification_time = temp_last_modification_time
+            print('%s modified. Restarting...' % temp_last_edited_filepath)
+            try: 
+                kill_proc_tree(process.pid)
+            except Exception as e:
+                print('\tUnable to kill process with ID %d. (Exception: %s' % (process.pid, e))
+                pass
+            process = subprocess.Popen(command, shell=True)
+            print ('New process started with ID %d.' % process.pid)
+        time.sleep(wait)
+
+if __name__ == '__main__':
+    main()
