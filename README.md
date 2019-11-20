@@ -1,27 +1,29 @@
 # resurgence
 Restart a process when files are changed
 
-## Inspiration 
-File watchers are standard in many development workflows, but most utilities only handle
-execution of short running processes (compilation, transpilation, formatting,
-linting). But what if a project not only want to run a command and let it finish, but instead start a process and let it run until the next change?
+## inspiration 
 
-This is where I was at when tinkering with [derivat](https://www.github.com/rwev/derivat), I wanted to see how code changes would affect the GUI (PyQT) interface. I couldn't use standard file watchers, because they either 1) would become unresponsive on first execution (application startup), never returning to to event loop and respond to more changes, 2) couldn't kill the previous process and thus would continuously spawn another application instance.
+File watchers are standard in many development workflows, but most utilities only handle execution of short-running processes (compilation, transpilation, formatting, linting). But what if the process runs infinitely?
 
-Resurgence is a product of this need - kill the previous process, if still
+When developing with `PyQt` for [derivat](https://www.github.com/rwev/derivat) and the `curses` for [bible](https://www.github.com/rwev/bible), I wanted to see how code changes would affect the graphical / terminal interface. I couldn't use standard file watchers, because they either 
+
+- would become unresponsive on first execution (application startup), never returning to to event loop and respond 
+- couldn't kill the previous process and thus would continuously spawn another application instance.
+
+`resurgence` is a product of this need - kill the previous process, if still
 running, and execute the specified command again, using the updated application source.
 
-## Requirements 
-Python 2.6+
-psutil
+## requirements 
+- `python` 2.6+
+- `psutil`
 
-## Installation
+## installation
 ```shell
 $ pip install https://www.github.com/rwev/resurgence/archive/master.zip
 ```
 
-## Usage
-```shell
+## usage
+```[shell]
 $ resurgence --help
 resurgence.py [options]
 Options:
@@ -40,7 +42,7 @@ Options:
                         Interval in seconds between checks for file changes.
 ```
 
-## Alternatives
+## alternatives
 - [when-changed](https://www.github.com/joh/when-changed), also a Python utility, 3rd party dependency watchdog, can't
   restart processes
 - [entr](https://www.github.com/clibs/entr), C utility, offers -r option to restart process, usable in Unix pipes

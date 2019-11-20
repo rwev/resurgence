@@ -8,11 +8,14 @@ Author: rwev (https://github.com/rwev)
 
 from __future__ import print_function
 
+import os
 import re
-import os, sys, subprocess
+import subprocess
+import sys
 import time
-import psutil
 from optparse import OptionParser
+
+import psutil
 
 
 def string_list_callback(option, opt, value, parser):
@@ -67,7 +70,7 @@ parser.add_option(
 )
 
 
-def get_observed_relative_filepaths_for_directory(relative_dir, include_subdirs=False):
+def get_observed_relative_filepaths_for_directory(relative_dir, regex_whitelist, include_subdirs=False):
     # returns list of relative paths to files to be observed
     relative_filepaths = []
     if include_subdirs:
@@ -127,14 +130,13 @@ def print_stdout(process):
 
 
 def main():
-
     (options, args) = parser.parse_args(sys.argv)
 
-    ##### ARGUMENT CHECKS #####
+    # ARGUMENT CHECKS #
 
     # must monitor at least one directory
     if (not options.do_observe_current_directory) and (
-        not len(options.additional_subdirectories_to_observe)
+            not len(options.additional_subdirectories_to_observe)
     ):
         print(
             "At least one directory must be observed: use argument(s) '-w' and / or '-d'."
@@ -158,7 +160,7 @@ def main():
             regex_rule = regex_rule[1:]
         regex_whitelist.append("%s$" % regex_rule)
 
-    ##### PROCESS ARGUMENTS #####
+    # PROCESS ARGUMENTS #
 
     command = options.command_to_run_str
     wait = options.file_check_interval_seconds
@@ -166,19 +168,18 @@ def main():
     filepaths_to_watch = []
     if options.do_observe_current_directory:
         filepaths_to_watch.extend(
-            get_observed_relative_filepaths_for_directory(".", include_subdirs=False)
+            get_observed_relative_filepaths_for_directory(".", regex_whitelist, include_subdirs=False)
         )
     for dir in options.additional_subdirectories_to_observe:
         filepaths_to_watch.extend(
-            get_observed_relative_filepaths_for_directory(dir, include_subdirs=True)
+            get_observed_relative_filepaths_for_directory(dir, regex_whitelist, include_subdirs=True)
         )
 
     print("Watching files:")
     for filepath in filepaths_to_watch:
         print("\t%s" % filepath)
 
-    ##### PROCESS AND OBSERVATION LOOP #####
-
+    # PROCESS AND OBSERVATION LOOP #
     # The current maximum file modified time under the watched directory
     last_edited_filepath, last_modification_time = get_last_edited_filepath_and_time(
         filepaths_to_watch
